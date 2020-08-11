@@ -1,0 +1,22 @@
+{
+  "cosmos_rpc_addr": "http://chain_based_on_cosmossdk:26657",
+  "cosmos_wallet": "./cosmos_key",
+  "cosmos_wallet_pwd": "",
+  "cosmos_start_height": 0,
+  "cosmos_listen_interval": 1,
+  "cosmos_chain_id": "cosmos-chain-id",
+  "cosmos_gas_price": "0.000001stake",
+  "cosmos_gas": 200000,
+
+  "poly_rpc_addr": "http://poly_rpc",
+  "poly_wallet": "./wallet.dat",
+  "poly_wallet_pwd": "",
+  "poly_start_height": 0,
+  "poly_listen_interval": 1,
+  "poly_to_cosmos_key": "makeProof",
+
+  "side_chain_id": 5,
+  "db_path": "./db",
+  "confirm_timeout": 300,
+  "log_level": 0
+}
