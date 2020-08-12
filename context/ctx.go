@@ -28,7 +28,8 @@ import (
 	"github.com/polynetwork/poly/core/types"
 	"github.com/polynetwork/poly/native/service/header_sync/cosmos"
 	tcrypto "github.com/tendermint/tendermint/crypto"
-	rpchttp "github.com/tendermint/tendermint/rpc/client"
+	"github.com/tendermint/tendermint/rpc/client"
+	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
 	rpctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"sync"
 )
@@ -66,7 +67,7 @@ func InitCtx(conf *Conf) error {
 	RCtx.ToPoly = make(chan *CosmosInfo, CHAN_BUF_SIZE)
 
 	// prepare COSMOS staff
-	RCtx.CMRpcCli, err = rpchttp.NewHTTP(conf.CosmosRpcAddr, "/websocket")
+	RCtx.CMRpcCli, err = rpchttp.New(conf.CosmosRpcAddr, "/websocket")
 	if err != nil {
 		return fmt.Errorf("failed to new Tendermint Cli: %v", err)
 	}
@@ -78,7 +79,7 @@ func InitCtx(conf *Conf) error {
 	if err != nil {
 		return err
 	}
-	res, err := RCtx.CMRpcCli.ABCIQueryWithOptions(QUERY_ACC_PATH, rawParam, rpchttp.ABCIQueryOptions{Prove: true})
+	res, err := RCtx.CMRpcCli.ABCIQueryWithOptions(QUERY_ACC_PATH, rawParam, client.ABCIQueryOptions{Prove: true})
 	if err != nil {
 		return err
 	}
