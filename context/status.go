@@ -113,14 +113,14 @@ func (s *CosmosStatus) Check() {
 					log.Infof("[Cosmos Status] cosmso tx %s is confirmed on block (height: %d) and success. ",
 						v.String(), resTx.Height)
 				} else {
-					if strings.Contains(resTx.TxResult.Log, COSMOS_TX_NOT_IN_EPOCH) {
+					if strings.Contains(resTx.TxResult.Log, CosmosTxNotInEpoch) {
 						log.Debugf("[Cosmos Status] cosmso tx %s is failed and this proof %s need reprove. ",
 							v.String(), vArr[i].Proof)
 						if err := RCtx.Db.SetPolyTxReproving(vArr[i].Txhash, vArr[i].Proof, vArr[i].Hdr); err != nil {
 							panic(err)
 						}
 					} else {
-						if res, _ := RCtx.CMRpcCli.ABCIQuery(PROOF_PATH, ccm.GetDoneTxKey(vArr[i].FromChainId, vArr[i].CCID)); res != nil && res.Response.GetValue() != nil {
+						if res, _ := RCtx.CMRpcCli.ABCIQuery(ProofPath, ccm.GetDoneTxKey(vArr[i].FromChainId, vArr[i].CCID)); res != nil && res.Response.GetValue() != nil {
 							log.Infof("[Cosmos Status] this poly tx %s is already committed, "+
 								"so delete it cosmos_txhash %s: (from_chain_id: %d, ccid: %s)",
 								vArr[i].Txhash, v.String(), vArr[i].FromChainId, hex.EncodeToString(vArr[i].CCID))

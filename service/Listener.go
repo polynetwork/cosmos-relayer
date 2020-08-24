@@ -182,9 +182,9 @@ func checkPolyHeight(h, epochHeight uint32) (int, error) {
 				_ = merkleValue.Deserialization(common.NewZeroCopySource(val))
 
 				// check if this cross-chain tx already committed on COSMOS
-				res, _ := ctx.CMRpcCli.ABCIQuery(context.PROOF_PATH, ccm.GetDoneTxKey(merkleValue.FromChainID,
+				res, err := ctx.CMRpcCli.ABCIQuery(context.ProofPath, ccm.GetDoneTxKey(merkleValue.FromChainID,
 					merkleValue.MakeTxParam.CrossChainID))
-				if res.Response.GetValue() != nil {
+				if err != nil || res == nil || res.Response.GetValue() != nil {
 					continue
 				}
 
@@ -295,7 +295,7 @@ func CosmosListen() {
 				continue
 			}
 			if !bytes.Equal(hdr.Header.ValidatorsHash, hdr.Header.NextValidatorsHash) {
-				log.Debugf("[ListenCosmos] header at %d is epoch switching point, so continue loop")
+				log.Debugf("[ListenCosmos] header at %d is epoch switching point, so continue loop", hdr.Header.Height)
 				lastRight = right
 				continue
 			}
@@ -311,7 +311,7 @@ func CosmosListen() {
 				if err != nil {
 					// If error happen, we should check this height again.
 					h--
-					if strings.Contains(err.Error(), context.RIGHT_HEIGHT_UPDATE) {
+					if strings.Contains(err.Error(), context.RightHeightUpdate) {
 						// Can't get proof from height `right-1`, update right to the latest.
 						log.Debugf("[ListenCosmos] %s", err.Error())
 						continue
@@ -384,7 +384,7 @@ func beforeCosmosListen() (int64, *time.Ticker, error) {
 // get proof, relayer update `rightPtr` and return.
 func checkCosmosHeight(h int64, hdrToVerifyProof *cosmos.CosmosHeader, infoArr []*context.CosmosInfo, rightPtr *int64) ([]*context.CosmosInfo, error) {
 	query := getTxQuery(h - 1)
-	res, err := ctx.CMRpcCli.TxSearch(query, true, 1, context.PER_PAGE, "asc")
+	res, err := ctx.CMRpcCli.TxSearch(query, true, 1, context.PerPage, "asc")
 	if err != nil {
 		return infoArr, err
 	}
@@ -417,20 +417,20 @@ func checkCosmosHeight(h int64, hdrToVerifyProof *cosmos.CosmosHeader, infoArr [
 
 	// get tx from pages
 	heightToGetProof := *rightPtr - 1
-	pages := ((res.TotalCount - 1) / context.PER_PAGE) + 1
+	pages := ((res.TotalCount - 1) / context.PerPage) + 1
 	for p := 1; p <= pages; p++ {
 		// already have page 1
 		if p > 1 {
-			if res, err = ctx.CMRpcCli.TxSearch(query, true, p, context.PER_PAGE, "asc"); err != nil {
+			if res, err = ctx.CMRpcCli.TxSearch(query, true, p, context.PerPage, "asc"); err != nil {
 				return infoArr, err
 			}
 		}
 		// get proof for every tx, and add them to txArr prepared to commit
 		for _, tx := range res.Txs {
 			hash := getKeyHash(tx)
-			res, _ := ctx.CMRpcCli.ABCIQueryWithOptions(context.PROOF_PATH, ccm.GetCrossChainTxKey(hash),
+			res, _ := ctx.CMRpcCli.ABCIQueryWithOptions(context.ProofPath, ccm.GetCrossChainTxKey(hash),
 				client.ABCIQueryOptions{Prove: true, Height: heightToGetProof})
-			if res.Response.GetValue() == nil {
+			if res == nil || res.Response.GetValue() == nil {
 				// If get the proof failed, that could means the header of height `heightToGetProof`
 				// is already pruned. And the cosmos node already delete the data on
 				// `heightToGetProof`. We need to update the height `right`, and check this height
@@ -438,11 +438,13 @@ func checkCosmosHeight(h int64, hdrToVerifyProof *cosmos.CosmosHeader, infoArr [
 				for {
 					status, err := ctx.CMRpcCli.Status()
 					if err != nil {
-						panic(err)
+						log.Errorf("failed to get status and could be something wrong with RPC: %v", err)
+						continue
 					}
 					hdrToVerifyProof, err = getCosmosHdr(status.SyncInfo.LatestBlockHeight - 1)
 					if err != nil {
-						panic(err)
+						log.Errorf("failed to get cosmos header info and could be something wrong with RPC: %v", err)
+						continue
 					}
 					*rightPtr = status.SyncInfo.LatestBlockHeight - 1
 					if bytes.Equal(hdrToVerifyProof.Header.ValidatorsHash, hdrToVerifyProof.Header.NextValidatorsHash) {
@@ -450,12 +452,12 @@ func checkCosmosHeight(h int64, hdrToVerifyProof *cosmos.CosmosHeader, infoArr [
 					}
 					context.SleepSecs(1)
 				}
-				return infoArr, fmt.Errorf("%s from %d to %d", context.RIGHT_HEIGHT_UPDATE, heightToGetProof+1, *rightPtr)
+				return infoArr, fmt.Errorf("%s from %d to %d", context.RightHeightUpdate, heightToGetProof+1, *rightPtr)
 			}
 			proof, _ := res.Response.Proof.Marshal()
 
 			kp := merkle.KeyPath{}
-			kp = kp.AppendKey([]byte(context.COSMOS_CROSS_CHAIN_MOD_NAME), merkle.KeyEncodingURL)
+			kp = kp.AppendKey([]byte(context.CosmosCrossChainModName), merkle.KeyEncodingURL)
 			kp = kp.AppendKey(res.Response.Key, merkle.KeyEncodingURL)
 			pv, _ := ctx.CMCdc.MarshalBinaryBare(&ccm_cosmos.CosmosProofValue{
 				Kp:    kp.String(),
@@ -505,14 +507,15 @@ func reproveCosmosTx(infoArr []*context.CosmosInfo, hdrToVerifyProof *cosmos.Cos
 	for i := 0; i < len(arr); i++ {
 		tx := arr[i]
 		hash := getKeyHash(tx)
-		res, _ := ctx.CMRpcCli.ABCIQueryWithOptions(context.PROOF_PATH, ccm.GetCrossChainTxKey(hash),
+		res, err := ctx.CMRpcCli.ABCIQueryWithOptions(context.ProofPath, ccm.GetCrossChainTxKey(hash),
 			client.ABCIQueryOptions{Prove: true, Height: hdrToVerifyProof.Header.Height - 1})
-		if res.Response.GetValue() == nil {
+		if err != nil || res == nil || res.Response.GetValue() == nil {
+			log.Errorf("[ReProve] failed to query proof and could be something wrong with RPC: %v", err)
 			return infoArr
 		}
 
 		kp := merkle.KeyPath{}
-		kp = kp.AppendKey([]byte(context.COSMOS_CROSS_CHAIN_MOD_NAME), merkle.KeyEncodingURL)
+		kp = kp.AppendKey([]byte(context.CosmosCrossChainModName), merkle.KeyEncodingURL)
 		kp = kp.AppendKey(res.Response.Key, merkle.KeyEncodingURL)
 		pv, _ := ctx.CMCdc.MarshalBinaryBare(&ccm_cosmos.CosmosProofValue{
 			Kp:    kp.String(),
@@ -594,7 +597,7 @@ func getPolyEpochOnCosmos() (*headersync.ConsensusPeers, error) {
 	if err != nil {
 		return nil, err
 	}
-	res, err := ctx.CMRpcCli.ABCIQuery(context.QUERY_CONSENSUS_PATH, data)
+	res, err := ctx.CMRpcCli.ABCIQuery(context.QueryConsensusPath, data)
 	if err != nil {
 		return nil, err
 	}
@@ -611,7 +614,7 @@ func getPolyEpochOnCosmos() (*headersync.ConsensusPeers, error) {
 func getKeyHash(tx *coretypes.ResultTx) []byte {
 	var hash []byte
 	for _, e := range tx.TxResult.Events {
-		if e.Type == context.COSMOS_PROOF_KEY {
+		if e.Type == context.CosmosProofKey {
 			hash, _ = hex.DecodeString(string(e.Attributes[2].Value))
 			break
 		}

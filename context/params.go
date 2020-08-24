@@ -24,18 +24,22 @@ import (
 )
 
 const (
-	PER_PAGE                    = 100 // (0, 100]
-	HDR_LIMIT_PER_BATCH         = 50
-	QUERY_CONSENSUS_PATH        = "/custom/" + headersync.ModuleName + "/" + headersync.QueryConsensusPeers
-	COSMOS_CROSS_CHAIN_MOD_NAME = ccm.ModuleName
-	RIGHT_HEIGHT_UPDATE         = "update latest height"
-	COSMOS_PROOF_KEY            = "make_from_cosmos_proof"
-	PROOF_PATH                  = "/store/" + ccm.ModuleName + "/key"
-	TX_ALREADY_EXIST            = "already done"
-	NEW_EPOCH                   = "lower than epoch switching height"
-	SEQ_ERR                     = "verify correct account sequence and chain-id"
-	BROADCAST_CONN_TIME_OUT     = "connection timed out"
-	UTXO_NOT_ENOUGH             = "current utxo is not enoug"
+	PerPage                 = 100 // (0, 100]
+	HdrLimitPerBatch        = 50
+	QueryConsensusPath      = "/custom/" + headersync.ModuleName + "/" + headersync.QueryConsensusPeers
+	CosmosCrossChainModName = ccm.ModuleName
+	RightHeightUpdate       = "update latest height"
+	CosmosProofKey          = "make_from_cosmos_proof"
+	ProofPath               = "/store/" + ccm.ModuleName + "/key"
+	TxAlreadyExist          = "already done"
+	NewEpoch                = "lower than epoch switching height"
+	SeqErr                  = "verify correct account sequence and chain-id"
+	BroadcastConnTimeOut    = "connection timed out"
+	UtxoNotEnough           = "current utxo is not enoug"
+	ChanBufSize             = 256
+	QueryAccPath            = "/custom/acc/account"
+	CosmosTxNotInEpoch      = "Compare height"
+	NoUsefulHeaders         = "no header you commited is useful"
 )
 
 var (
