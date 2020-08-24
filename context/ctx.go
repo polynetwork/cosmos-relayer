@@ -34,12 +34,6 @@ import (
 	"sync"
 )
 
-const (
-	CHAN_BUF_SIZE          = 256
-	QUERY_ACC_PATH         = "/custom/acc/account"
-	COSMOS_TX_NOT_IN_EPOCH = "Compare height"
-)
-
 type InfoType int
 
 const (
@@ -63,8 +57,8 @@ func InitCtx(conf *Conf) error {
 	setCosmosEnv(conf.CosmosChainId)
 
 	// channels
-	RCtx.ToCosmos = make(chan *PolyInfo, CHAN_BUF_SIZE)
-	RCtx.ToPoly = make(chan *CosmosInfo, CHAN_BUF_SIZE)
+	RCtx.ToCosmos = make(chan *PolyInfo, ChanBufSize)
+	RCtx.ToPoly = make(chan *CosmosInfo, ChanBufSize)
 
 	// prepare COSMOS staff
 	RCtx.CMRpcCli, err = rpchttp.New(conf.CosmosRpcAddr, "/websocket")
@@ -79,7 +73,7 @@ func InitCtx(conf *Conf) error {
 	if err != nil {
 		return err
 	}
-	res, err := RCtx.CMRpcCli.ABCIQueryWithOptions(QUERY_ACC_PATH, rawParam, client.ABCIQueryOptions{Prove: true})
+	res, err := RCtx.CMRpcCli.ABCIQueryWithOptions(QueryAccPath, rawParam, client.ABCIQueryOptions{Prove: true})
 	if err != nil {
 		return err
 	}

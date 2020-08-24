@@ -76,12 +76,12 @@ func handleCosmosHdrs(headers []*mcosmos.CosmosHeader) error {
 		ctx.PolyStatus.Wg.Wait()
 		ctx.PolyStatus.Wg.Add(1)
 	}
-	for i := 0; i < len(headers); i += context.HDR_LIMIT_PER_BATCH {
+	for i := 0; i < len(headers); i += context.HdrLimitPerBatch {
 		var hdrs []*mcosmos.CosmosHeader
-		if i+context.HDR_LIMIT_PER_BATCH > len(headers) {
+		if i+context.HdrLimitPerBatch > len(headers) {
 			hdrs = headers[i:]
 		} else {
-			hdrs = headers[i : i+context.HDR_LIMIT_PER_BATCH]
+			hdrs = headers[i : i+context.HdrLimitPerBatch]
 		}
 		info := make([]string, len(hdrs))
 		raw := make([][]byte, len(hdrs))
@@ -103,6 +103,11 @@ func handleCosmosHdrs(headers []*mcosmos.CosmosHeader) error {
 				log.Errorf("[handleCosmosHdr] post error, retry after 10 sec wait: %v", err)
 				context.SleepSecs(10)
 				goto SYNC_RETRY
+			}
+			if strings.Contains(err.Error(), context.NoUsefulHeaders) {
+				log.Warnf("[handleCosmosHdr] your headers could be wrong or already committed: headers: [ %s ]",
+					strings.Join(info, ", "))
+				return nil
 			}
 			log.Errorf("[handleCosmosHdr] failed to relay cosmos header to Poly: %v", err)
 			return err
@@ -143,19 +148,19 @@ RELAY_RETRY:
 	txhash, err := ctx.Poly.Native.Ccm.ImportOuterTransfer(ctx.Conf.SideChainId, tx.PVal, uint32(tx.ProofHeight+1),
 		tx.Proof, ctx.PolyAcc.Address[:], raw, ctx.PolyAcc)
 	if err != nil {
-		if strings.Contains(err.Error(), context.TX_ALREADY_EXIST) {
+		if strings.Contains(err.Error(), context.TxAlreadyExist) {
 			log.Debugf("[handleCosmosTx] tx already on Poly: (txhash: %s)", tx.Tx.Hash.String())
 			if err = ctx.Db.DelCosmosTxReproving(tx.Tx.Hash); err != nil {
 				panic(err)
 			}
 			return
-		} else if strings.Contains(err.Error(), context.NEW_EPOCH) {
+		} else if strings.Contains(err.Error(), context.NewEpoch) {
 			log.Debugf("[handleCosmosTx] new epoch already, tx %s need to reprove: %v", tx.Tx.Hash.String(), err)
 			if err = ctx.Db.SetCosmosTxReproving(tx.Tx); err != nil {
 				panic(fmt.Errorf("[handleCosmosTx] failed to save cosmos tx into DB: %v", err))
 			}
 			return
-		} else if strings.Contains(err.Error(), context.UTXO_NOT_ENOUGH) {
+		} else if strings.Contains(err.Error(), context.UtxoNotEnough) {
 			log.Debugf("[handleCosmosTx] this tx transfers btc back to bitcoin but utxo on poly is not "+
 				"enough which is pretty weird, so reprove tx %s: %v", tx.Tx.Hash.String(), err)
 			if err = ctx.Db.SetCosmosTxReproving(tx.Tx); err != nil {
@@ -287,14 +292,14 @@ func sendCosmosTx(msgs []types2.Msg) (*core_types.ResultBroadcastTx, uint64, err
 	for {
 		res, err = ctx.CMRpcCli.BroadcastTxSync(rawTx)
 		if err != nil {
-			if strings.Contains(err.Error(), context.BROADCAST_CONN_TIME_OUT) {
+			if strings.Contains(err.Error(), context.BroadcastConnTimeOut) {
 				context.SleepSecs(10)
 				continue
 			}
 			return nil, seq, fmt.Errorf("failed to broadcast tx: (error: %v, raw tx: %x)", err, rawTx)
 		}
 		if res.Code != 0 {
-			if strings.Contains(res.Log, context.SEQ_ERR) {
+			if strings.Contains(res.Log, context.SeqErr) {
 				context.SleepSecs(1)
 				continue
 			}

@@ -81,7 +81,7 @@ func TestTOCosmosRoutine(t *testing.T) {
 	//	t.Fatal(err)
 	//}
 	//fmt.Println(status.SyncInfo.LatestBlockHeight, tx.Height)
-	//res, err := ctx.CMRpcCli.ABCIQueryWithOptions(PROOF_PATH, append(crosschain.CrossChainTxDetailPrefix, hash...),
+	//res, err := ctx.CMRpcCli.ABCIQueryWithOptions(ProofPath, append(crosschain.CrossChainTxDetailPrefix, hash...),
 	//	client.ABCIQueryOptions{Prove: true, Height: status.SyncInfo.LatestBlockHeight - 1})
 	//if err != nil {
 	//	t.Fatal(err)
