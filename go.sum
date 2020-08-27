@@ -113,6 +113,7 @@ github.com/coreos/pkg v0.0.0-20160727233714-3ac0863d7acf/go.mod h1:E3G3o1h8I7cfc
 github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f/go.mod h1:E3G3o1h8I7cfcXa63jLwjI0eiQQMgzzUDFVpN/nH/eA=
 github.com/cosmos/cosmos-sdk v0.38.4 h1:jPZOvhMQkm7wwwzcLxuluhVpKfuIgddNGt999pAiz/Y=
 github.com/cosmos/cosmos-sdk v0.38.4/go.mod h1:rzWOofbKfRt3wxiylmYWEFHnxxGj0coyqgWl2I9obAw=
+github.com/cosmos/cosmos-sdk v0.39.0/go.mod h1:3iKiqnQ48T0UG4IDw9EM8utQSwItutLUkmGkRSWpS5U=
 github.com/cosmos/cosmos-sdk v0.39.1 h1:vhjf9PZh9ph8btAj9aBpHoVITgVVjNBpM3x5Gl/Vwac=
 github.com/cosmos/cosmos-sdk v0.39.1/go.mod h1:ry2ROl5n+f2/QXpKJo3rdWNJwll00z7KhIVcxNcl16M=
 github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d h1:49RLWk1j44Xu4fjHb6JFYmeUnDORVwHNkDxaQ0ctCVU=
@@ -456,6 +457,8 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/polynetwork/cosmos-poly-module v0.0.0-20200618084422-1e7a29b91b14/go.mod h1:xd+xtXSRyj8+5ns9wtkpuX5tGGVEuVRYQAVtsG+/nGg=
 github.com/polynetwork/cosmos-poly-module v0.0.0-20200722084435-f917a9a3331f h1:SgfLnLitrBzWfUnpJOJqhkrCBll5AuS8KsCrySto3hk=
 github.com/polynetwork/cosmos-poly-module v0.0.0-20200722084435-f917a9a3331f/go.mod h1:VMBJZ8GSZeoWBntd/rWx2Rr5roRKofO7siP1qd6A6pY=
+github.com/polynetwork/cosmos-poly-module v0.0.0-20200820072952-f055e673d75e h1:J0/drEMIV9i6R/RJR7qMpHaXFf5yL9IyG6D4Msobjzs=
+github.com/polynetwork/cosmos-poly-module v0.0.0-20200820072952-f055e673d75e/go.mod h1:2yG7l1tZPpFseWUhqm3hdQ0Q85o2x26zhBFnUzEjRCI=
 github.com/polynetwork/poly v0.0.0-20200710095239-0596a3d7afe5/go.mod h1:UzlGEWk0eCGsuMJOZfBoZjRbmu4Yw/SudKAIFe1gPnY=
 github.com/polynetwork/poly v0.0.0-20200715030435-4f1d1a0adb44 h1:QXznsPhBBa1vY6Fhav8S9+qoHBi8iGy6g1VeIMdYglI=
 github.com/polynetwork/poly v0.0.0-20200715030435-4f1d1a0adb44/go.mod h1:UzlGEWk0eCGsuMJOZfBoZjRbmu4Yw/SudKAIFe1gPnY=
@@ -587,6 +590,7 @@ github.com/tendermint/tendermint v0.33.2/go.mod h1:25DqB7YvV1tN3tHsjWoc2vFtlwICf
 github.com/tendermint/tendermint v0.33.3 h1:6lMqjEoCGejCzAghbvfQgmw87snGSqEhDTo/jw+W8CI=
 github.com/tendermint/tendermint v0.33.3/go.mod h1:25DqB7YvV1tN3tHsjWoc2vFtlwICfrub9XO6UBO+4xk=
 github.com/tendermint/tendermint v0.33.5/go.mod h1:0yUs9eIuuDq07nQql9BmI30FtYGcEC60Tu5JzB5IezM=
+github.com/tendermint/tendermint v0.33.6/go.mod h1:0yUs9eIuuDq07nQql9BmI30FtYGcEC60Tu5JzB5IezM=
 github.com/tendermint/tendermint v0.33.7 h1:b5CQD8ggDtl4u0EbXzabi0MaOw9NrcXker6ijEkAE74=
 github.com/tendermint/tendermint v0.33.7/go.mod h1:0yUs9eIuuDq07nQql9BmI30FtYGcEC60Tu5JzB5IezM=
 github.com/tendermint/tm-db v0.4.1/go.mod h1:JsJ6qzYkCGiGwm5GHl/H5GLI9XLb6qZX7PRe425dHAY=

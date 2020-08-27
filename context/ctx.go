@@ -190,7 +190,7 @@ type CosmosInfo struct {
 	Tx *CosmosTx
 
 	// header part
-	Hdrs []*cosmos.CosmosHeader
+	Hdrs []cosmos.CosmosHeader
 }
 
 type CosmosTx struct {
