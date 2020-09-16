@@ -4,3 +4,4 @@ db.bin
 .idea
 run_cosmos_relayer
 test.go
+conf-debug.json

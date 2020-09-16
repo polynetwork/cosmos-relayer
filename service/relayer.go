@@ -69,7 +69,7 @@ func ToPolyRoutine() {
 // Process cosmos-headers msg. This function would not return before our
 // Ploygon tx committing headers confirmed. This guarantee that the next
 // cross-chain txs next to relay can be proved on Poly.
-func handleCosmosHdrs(headers []*mcosmos.CosmosHeader) error {
+func handleCosmosHdrs(headers []mcosmos.CosmosHeader) error {
 	if ctx.PolyStatus.Len() > 0 {
 		ctx.PolyStatus.IsBlocked = true
 		ctx.PolyStatus.CosmosEpochHeight = headers[0].Header.Height
@@ -77,7 +77,7 @@ func handleCosmosHdrs(headers []*mcosmos.CosmosHeader) error {
 		ctx.PolyStatus.Wg.Add(1)
 	}
 	for i := 0; i < len(headers); i += context.HdrLimitPerBatch {
-		var hdrs []*mcosmos.CosmosHeader
+		var hdrs []mcosmos.CosmosHeader
 		if i+context.HdrLimitPerBatch > len(headers) {
 			hdrs = headers[i:]
 		} else {
@@ -86,7 +86,7 @@ func handleCosmosHdrs(headers []*mcosmos.CosmosHeader) error {
 		info := make([]string, len(hdrs))
 		raw := make([][]byte, len(hdrs))
 		for i, h := range hdrs {
-			r, err := ctx.CMCdc.MarshalBinaryBare(*h)
+			r, err := ctx.CMCdc.MarshalBinaryBare(h)
 			if err != nil {
 				log.Fatalf("[handleCosmosHdr] failed to marshal CosmosHeader: %v", err)
 				return err
@@ -139,8 +139,8 @@ func handleCosmosHdrs(headers []*mcosmos.CosmosHeader) error {
 }
 
 // Relay COSMOS cross-chain tx to polygon.
-func handleCosmosTx(tx *context.CosmosTx, hdr *mcosmos.CosmosHeader) {
-	raw, err := ctx.CMCdc.MarshalBinaryBare(*hdr)
+func handleCosmosTx(tx *context.CosmosTx, hdr mcosmos.CosmosHeader) {
+	raw, err := ctx.CMCdc.MarshalBinaryBare(hdr)
 	if err != nil {
 		panic(fmt.Errorf("failed to marshal cosmos header %s: %v", hdr.Commit.BlockID.Hash.String(), err))
 	}

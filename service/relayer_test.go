@@ -21,14 +21,13 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/types"
-	"github.com/ontio/ontology/common"
-	"github.com/ontio/ontology/smartcontract/service/native/utils"
 	"github.com/polynetwork/cosmos-poly-module/headersync"
 	"github.com/polynetwork/cosmos-relayer/context"
 	"github.com/polynetwork/poly-go-sdk"
+	"github.com/polynetwork/poly/common"
+	types2 "github.com/polynetwork/poly/core/types"
 	"github.com/polynetwork/poly/native/service/header_sync/cosmos"
 	"github.com/stretchr/testify/assert"
-	"math"
 	"strings"
 	"testing"
 	"time"
@@ -283,12 +282,21 @@ func TestToCosmosRoutine(t *testing.T) {
 	//fmt.Println(acc.String())
 	//
 	//fmt.Println(hex.EncodeToString([]byte("mpCNjy4QYAmw8eumHJRbVtt6bMDVQvPpFn")))
-	a := uint64(math.MaxInt64)
-	sink := common.NewZeroCopySink(nil)
-	utils.EncodeVarUint(sink, a)
-	val, err := utils.DecodeVarUint(common.NewZeroCopySource(sink.Bytes()))
+	//a := uint64(math.MaxInt64)
+	//sink := common.NewZeroCopySink(nil)
+	//utils.EncodeVarUint(sink, a)
+	//val, err := utils.DecodeVarUint(common.NewZeroCopySource(sink.Bytes()))
+	//if err != nil {
+	//	t.Fatal(err)
+	//}
+	//fmt.Println(val)
+	raw := "000000009b915617000000008a8be062ace42d9d414bd4bdd5f9eb0e98c26f6b7ffbb69b4a1c43c522e973d8ba6f9ce33a6bad1c67f11d93d0b51c9a92a6dbfe0dd18eb84ced6c3034a70b5500000000000000000000000000000000000000000000000000000000000000002345c2204e9f1c38f833ab71ab58ea6f841440ad374183a1cbd6fb0a26e53fcedc4c475f36ff01005e159a8b139e1877fd11017b226c6561646572223a362c227672665f76616c7565223a22424148315a51375347444631356c6d487456585938674a574f4d6d3330367869632b6e72674b4d316448475a4c73436362324f48463043734d4964442b2b6f31444d6e537a70755a494e335362784d4d744a382f3070553d222c227672665f70726f6f66223a224f7244347271477258314d33743779496b355a312f6949697544686e77654761672b615358372b4557764134772f73762b6b416c7036456f3442564a72322b797a7a4b72543364502f6c30525743596a6e2b744863773d3d222c226c6173745f636f6e6669675f626c6f636b5f6e756d223a3132303030302c226e65775f636861696e5f636f6e666967223a6e756c6c7d00000000000000000000000000000000000000000623120502eb1baab602c5899282561cdaaa7aabbcdd0ccfcbc3e79793ac24acf90778f35a23120502468dd1899ed2d1cc2b829882a165a0ecb6a745af0c72eb2982d66b4311b4ef73231205038b8af6210ecfdcbcab22552ef8d8cf41c6f86f9cf9ab53d865741cfdb833f06b231205028172918540b2b512eae1872a2a2e3a28d989c60d95dab8829ada7d7dd706d658231205031e0779f5c5ccb2612352fe4a200f99d3e7758e70ba53f607c59ff22a30f678ff23120502482acb6564b19b90653f6e9c806292e8aa83f78e7a9382a24a6efe41c0c06f390642011bf5c46be4ce30c0f68a33d71b4e77bcb03501c10292844ee9397e6d58e93d982a2b9dbaa5a03717cee5a6845bc162965b7da1c658ece5efeb99dd2d007111b5c842011c84e74eee4be4c00b559dd7a5a8be12e403798ec21568287de0479e0624824fdd71249bcfd3198d22def17ee738ea1260f7d31c60654d5b733e00830942eaabe542011b88cc305573abd188b16be354067128feb9fa314d00a05203b4210344b7906c2c47323f881ca24b3362e35618588335085e51f45e51b0fb85b741b2b4bfd8638f42011b3980da5d5402befdf1f48c0d767fb8bc7bfd4c46d3cc39faea4234b2018039232239c3997c8ee67b8de3fe045e89ced0b54db039e9053d1f8a9d142534225fa442011cdcb9a09645b34efd40fd96d81fe19e233ecc582776893e2fef9a81b829dacd070e95a7df88589382e6a2dc147b1afe35995c00d93b3d3a4c9fa4dcc178e9b41c42011bf986f35f5d74e74bb809044f1256a850662f13605f577d96af7dc1e33054b613727c1033a89edbcb9144f80ed655786698f48114a9b021b346df6e83bef4aa70"
+	rawB, _ := hex.DecodeString(raw)
+	header := &types2.Header{}
+	err := header.Deserialization(common.NewZeroCopySource(rawB))
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Println(val)
+
+	fmt.Println(header.ChainID)
 }
